@@ -24,7 +24,7 @@ SET(LIB ${CMAKE_SOURCE_DIR}/lib)
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost 1.40.0 COMPONENTS random)
+find_package(Boost 1.45.0 COMPONENTS random)
 find_package(Eigen3 3.1.0)
 
 ###########################################
@@ -50,8 +50,9 @@ SET(LIBRARY_OUTPUT_PATH ${LIB} CACHE PATH "Output directory for the libraries")
 SET(EXECUTABLE_OUTPUT_PATH ${BIN} CACHE PATH "Output directory for the executables")
 
 # allow linking to these directories
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
+MESSAGE(${EIGEN3_INCLUDE_DIR})
 
 ############################
 # make an uninstall target #
