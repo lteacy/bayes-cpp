@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 #include "gp/sqdist.h"
 #include "gp/CovSEiso.h"
+#include "gp/CovNoise.h"
 
 /**
  * Module namespace.
@@ -14,9 +15,55 @@
 namespace {
 
 /**
-* Maximum error allowed when comparing real numbers for equality.
-*/
+ * Maximum error allowed when comparing real numbers for equality.
+ */
 const double EPSILON = 1e-8;
+
+/**
+ * Test the noise and sum variance.
+ */
+int testNoise()
+{
+   using namespace Eigen;
+
+   //***************************************************************************
+   // Create test matrices
+   //***************************************************************************
+   Matrix<double, 10, 2> m1(Matrix<double, 10, 2>::Identity()*7.2);
+   Matrix<double, 10, 7> m2(Matrix<double, 10, 7>::Identity()*7.2);
+   std::cout << "Matrix 1: " << std::endl;
+   std::cout << m1 << std::endl;
+   std::cout << "Matrix 2: " << std::endl;
+   std::cout << m2 << std::endl;
+
+   //***************************************************************************
+   // Create covariance function.
+   //***************************************************************************
+   bayes::gp::CovNoise kernel(3.52);
+
+   //***************************************************************************
+   // Calculate covariance between m1 and m2
+   //***************************************************************************
+   Array<double,Dynamic,Dynamic> cov;
+   kernel(m1,m2,cov);
+   std::cout << "Covariance:\n" << cov << std::endl;
+
+   //***************************************************************************
+   // Self covariance for m1
+   //***************************************************************************
+   kernel(m1,cov);
+   std::cout << "Covariance:\n" << cov << std::endl;
+
+   //***************************************************************************
+   // Self covariance for m2
+   //***************************************************************************
+   kernel.var(23.5);
+   kernel(m2,m2,cov);
+   std::cout << "Covariance:\n" << cov << std::endl;
+
+   return EXIT_SUCCESS;
+
+} // function testNoise
 
 /**
  * Test the Isotropic squared distance.
@@ -63,7 +110,8 @@ int testSEiso()
    std::cout << "Covariance: " << cov << std::endl;
 
    return EXIT_SUCCESS;
-}
+
+} // function testSEiso
 
 /**
  * Test that the squared distance is working.
@@ -143,6 +191,16 @@ int main()
          return EXIT_FAILURE;
       }
       std::cout << "Squared Exponential test passed." << std::endl;
+
+      //************************************************************************
+      // Test Noise Covariance function.
+      //************************************************************************
+      if(EXIT_SUCCESS!=testNoise())
+      {
+         std::cout << "Noise test failed." << std::endl;
+         return EXIT_FAILURE;
+      }
+      std::cout << "Noise test passed." << std::endl;
       
    }
    catch(std::exception& e)

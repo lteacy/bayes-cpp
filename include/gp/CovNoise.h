@@ -63,10 +63,15 @@ public:
       sqdist(m1,m2,dist);
 
       //************************************************************************
-      // From this, calculate the covariance.
+      // Substract small scalar so that equality comparison is not over
+      // sensitive to poor precision.
       //************************************************************************
-      result = logScale_i-dist.array()/length_i;
-      result = result.exp();
+      dist -= Eigen::NumTraits<typename MR::Scalar>::dummy_precision();
+
+      //************************************************************************
+      // From this, the covariance is zero, unless the distance is zero.
+      //************************************************************************
+      result = (dist<=0).template cast<typename MR::Scalar>() * var_i;
 
    } // operator ()
 
