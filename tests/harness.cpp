@@ -8,6 +8,7 @@
 #include "gp/sqdist.h"
 #include "gp/CovSEiso.h"
 #include "gp/CovNoise.h"
+#include "gp/CovSum.h"
 
 /**
  * Module namespace.
@@ -25,6 +26,7 @@ const double EPSILON = 1e-8;
 int testNoise()
 {
    using namespace Eigen;
+   using namespace bayes::gp;
 
    //***************************************************************************
    // Create test matrices
@@ -40,6 +42,8 @@ int testNoise()
    // Create covariance function.
    //***************************************************************************
    bayes::gp::CovNoise kernel(3.52);
+   bayes::gp::CovSEiso iso(1,500);
+   bayes::gp::CovSum<CovNoise,CovSEiso> sum(kernel,iso);
 
    //***************************************************************************
    // Calculate covariance between m1 and m2
@@ -47,6 +51,12 @@ int testNoise()
    Array<double,Dynamic,Dynamic> cov;
    kernel(m1,m2,cov);
    std::cout << "Covariance:\n" << cov << std::endl;
+
+   //***************************************************************************
+   // Self covariance for m1 and m2
+   //***************************************************************************
+   sum(m1,m2,cov);
+   std::cout << "Sum Covariance:\n" << cov << std::endl;
 
    //***************************************************************************
    // Self covariance for m1
