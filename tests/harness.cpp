@@ -6,6 +6,113 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include "gp/sqdist.h"
+#include "gp/CovSEiso.h"
+
+/**
+ * Module namespace.
+ */
+namespace {
+
+/**
+* Maximum error allowed when comparing real numbers for equality.
+*/
+const double EPSILON = 1e-8;
+
+/**
+ * Test the Isotropic squared distance.
+ */
+int testSEiso()
+{
+   using namespace Eigen;
+
+   //***************************************************************************
+   // Create test matrices
+   //***************************************************************************
+   Matrix<double, 4, 3> m1(Matrix<double, 4, 3>::Identity());
+   Matrix<double, 4, 1> m2(Matrix<double, 4, 1>::Identity()*2.5);
+   std::cout << "Matrix 1: " << std::endl;
+   std::cout << m1 << std::endl;
+   std::cout << "Matrix 2: " << std::endl;
+   std::cout << m2 << std::endl;
+
+   //***************************************************************************
+   // Create covariance function.
+   //***************************************************************************
+   bayes::gp::CovSEiso kernel(2.1,3.2);
+
+   //***************************************************************************
+   // Calculate covariance between m1 and m2
+   //***************************************************************************
+   Array<double,Dynamic,Dynamic> cov;
+   kernel(m1,m2,cov);
+   std::cout << "Covariance:\n" << cov << std::endl;
+
+   //***************************************************************************
+   // Self covariance for m1
+   //***************************************************************************
+   kernel.scale(1);
+   kernel.length(3);
+   kernel(m1,cov);
+   std::cout << "Covariance:\n" << cov << std::endl;
+
+   //***************************************************************************
+   // Self covariance for m2
+   //***************************************************************************
+   kernel.scale(2);
+   kernel(m2,m2,cov);
+   std::cout << "Covariance: " << cov << std::endl;
+
+   return EXIT_SUCCESS;
+}
+
+/**
+ * Test that the squared distance is working.
+ */
+int testSquaredDistance()
+{
+   using namespace Eigen;
+
+   //***************************************************************************
+   // Create test matrices
+   //***************************************************************************
+   Matrix<double, 5, 3> m1(Matrix<double, 5, 3>::Identity());
+   Matrix<double, 5, 4> m2(Matrix<double, 5, 4>::Identity()*2.1);
+   std::cout << "Matrix 1: " << std::endl;
+   std::cout << m1 << std::endl;
+   std::cout << "Matrix 2: " << std::endl;
+   std::cout << m2 << std::endl;
+
+   //***************************************************************************
+   // Calculate the squared distance between them
+   //***************************************************************************
+   Matrix<double,Dynamic,4> dist;
+   bayes::gp::sqdist(m2,dist);
+   std::cout << "Squared distance m2,m2:\n" << dist << std::endl;
+   bayes::gp::sqdist(m1,m2,dist);
+   std::cout << "Squared distance m1,m2:\n" << dist << std::endl;
+
+   //***************************************************************************
+   // Correct result
+   //***************************************************************************
+   Matrix<double,3,4> correctDist;
+   correctDist << 1.21, 5.41, 5.41, 5.41,
+                  5.41, 1.21, 5.41, 5.41,
+                  5.41, 5.41, 1.21, 5.41;
+
+   //***************************************************************************
+   // Validate the squared distance
+   //***************************************************************************
+   double distError = (correctDist-dist).lpNorm<Infinity>();
+   if(EPSILON < distError)
+   {
+      std::cout << "Incorrect Squared Distance" << std::endl;
+      return EXIT_FAILURE;
+   }
+   return EXIT_SUCCESS;
+   
+} // function testSquaredDistance()
+   
+} // module namespace
 
 /**
  * Test harness (not yet implmented).
@@ -18,16 +125,25 @@ int main()
    try
    {
       //************************************************************************
-      // Create test matrices
+      // Test squared distance function
       //************************************************************************
-      Matrix<double, 5, 3> m1(Matrix<double, 5, 3>::Identity());
-      Matrix<double, 5, 3> m2(Matrix<double, 5, 3>::Identity()*2);
-      std::cout << "Matrix 1: " << std::endl;
-      std::cout << m1 << std::endl;
-      std::cout << "Matrix 2: " << std::endl;
-      std::cout << m2 << std::endl;
-      double dist = bayes::gp::sqdist(m1,m2);
-      std::cout << "Squared distance: " << dist << std::endl;
+      if(EXIT_SUCCESS!=testSquaredDistance())
+      {
+         std::cout << "Squared distance test failed." << std::endl;
+         return EXIT_FAILURE;
+      }
+      std::cout << "Squared distance test passed." << std::endl;
+
+      //************************************************************************
+      // Test Squared Exponential Covariance function.
+      //************************************************************************
+      if(EXIT_SUCCESS!=testSEiso())
+      {
+         std::cout << "Squared Exponential test failed." << std::endl;
+         return EXIT_FAILURE;
+      }
+      std::cout << "Squared Exponential test passed." << std::endl;
+      
    }
    catch(std::exception& e)
    {
