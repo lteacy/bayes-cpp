@@ -5,10 +5,7 @@
 #include <exception>
 #include <iostream>
 #include <Eigen/Dense>
-#include "gp/sqdist.h"
-#include "gp/CovSEiso.h"
-#include "gp/CovNoise.h"
-#include "gp/CovSum.h"
+#include "gp/cov.h"
 
 /**
  * Module namespace.
