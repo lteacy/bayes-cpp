@@ -78,6 +78,7 @@ MESSAGE(${EIGEN3_INCLUDE_DIR})
 # build test harnesses        #
 ###############################
 ADD_EXECUTABLE(harness tests/harness.cpp)
+ADD_EXECUTABLE(sandbox tests/sandbox.cpp)
 #TARGET_LINK_LIBRARIES(harness Bayes)
 
 ###############################
