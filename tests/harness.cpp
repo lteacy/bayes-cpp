@@ -43,7 +43,7 @@ int testNoise()
    bayes::gp::CovNoise kernel(3.52);
    bayes::gp::CovSEiso iso(1,500);
    bayes::gp::CovSum<CovNoise,CovSEiso> sum(kernel,iso);
-   BOOST_AUTO(sum2,kernel+iso+iso);
+   auto sum2 = kernel+iso+iso;
 
    //***************************************************************************
    // Calculate covariance between m1 and m2

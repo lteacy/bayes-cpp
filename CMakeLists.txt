@@ -12,6 +12,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_BUILD_TYPE Debug)
 #SET(CMAKE_BUILD_TYPE Release)
 
+list( APPEND CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++" )
+list( APPEND LINK_FLAGS "-stdlib=libc++" )
+
 # verbose makefile
 SET(CMAKE_VERBOSE_MAKEFILE OFF)
 
