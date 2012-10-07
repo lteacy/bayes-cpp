@@ -78,6 +78,14 @@ public:
 
 }; // class CovSum
 
+/**
+ * Adds two covariance functions together.
+ */
+template<class C1,class C2> CovSum<C1,C2> operator+(const C1& c1, const C2& c2)
+{
+   return CovSum<C1,C2>(c1,c2);
+}
+
 } // namespace gp
 } // namespace bayes
 

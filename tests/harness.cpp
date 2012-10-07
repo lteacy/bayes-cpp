@@ -2,6 +2,8 @@
  * @file mdpHarness.cpp
  * Test harness. 
  */
+#include <boost/typeof/typeof.hpp>
+#include <boost/typeof/std/utility.hpp>
 #include <exception>
 #include <iostream>
 #include <Eigen/Dense>
@@ -41,6 +43,7 @@ int testNoise()
    bayes::gp::CovNoise kernel(3.52);
    bayes::gp::CovSEiso iso(1,500);
    bayes::gp::CovSum<CovNoise,CovSEiso> sum(kernel,iso);
+   BOOST_AUTO(sum2,kernel+iso+iso);
 
    //***************************************************************************
    // Calculate covariance between m1 and m2
@@ -54,6 +57,8 @@ int testNoise()
    //***************************************************************************
    sum(m1,m2,cov);
    std::cout << "Sum Covariance:\n" << cov << std::endl;
+   sum2(m1,m2,cov);
+   std::cout << "Sum2 Covariance:\n" << cov << std::endl;
 
    //***************************************************************************
    // Self covariance for m1
