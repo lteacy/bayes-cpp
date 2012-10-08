@@ -1,0 +1,7 @@
+package bayes.proto;
+message Matrix
+{
+   optional uint32 rows = 1 [default = 0];
+   optional uint32 cols = 2 [default = 0];
+   repeated double data = 3;
+}

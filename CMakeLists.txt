@@ -12,8 +12,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_BUILD_TYPE Debug)
 #SET(CMAKE_BUILD_TYPE Release)
 
-list( APPEND CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++" )
-list( APPEND LINK_FLAGS "-stdlib=libc++" )
+#list( APPEND CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++" )
+#list( APPEND LINK_FLAGS "-stdlib=libc++" )
 
 # verbose makefile
 SET(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -29,6 +29,20 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost 1.40.0 COMPONENTS random)
 find_package(Eigen3 3.1.0)
+
+###########################################
+# PROTOCOL BUFFERS                        #
+###########################################
+INCLUDE(FindProtocolBuffers.cmake)
+IF(PROTOBUF_FOUND)
+   FILE(GLOB PROTO_FILES proto/*.proto)
+   WRAP_PROTO(PROTO_GENERATED ${PROTO_FILES})
+   INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/proto_gen ${PROTOBUF_INCLUDE_DIRECTORIES})
+   MESSAGE("Proto generated: " ${PROTO_GENERATED})
+   MESSAGE("proto include: ${PROTOBUF_INCLUDE_DIRECTORIES}")
+   ADD_LIBRARY(BayesProto SHARED ${PROTO_GENERATED})
+   TARGET_LINK_LIBRARIES (BayesProto ${PROTOBUF_LIBRARY})
+ENDIF(PROTOBUF_FOUND)
 
 ###########################################
 # Generate Documentation                  #
@@ -82,11 +96,13 @@ MESSAGE(${EIGEN3_INCLUDE_DIR})
 ###############################
 ADD_EXECUTABLE(harness tests/harness.cpp)
 ADD_EXECUTABLE(sandbox tests/sandbox.cpp)
-#TARGET_LINK_LIBRARIES(harness Bayes)
+add_executable(protoHarness tests/protoHarness.cpp)
+target_link_libraries(protoHarness BayesProto)
 
 ###############################
 # enable testing              #
 ###############################
 ENABLE_TESTING()
 ADD_TEST(TEST1 ${CMAKE_SOURCE_DIR}/bin/harness)
+ADD_TEST(PROTO ${CMAKE_SOURCE_DIR}/bin/protoHarness)
 

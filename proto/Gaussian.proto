@@ -1,0 +1,7 @@
+package bayes.proto;
+import "Matrix.proto";
+message Gaussian
+{
+   optional Matrix mean = 1;
+   optional Matrix cov = 2;
+}
